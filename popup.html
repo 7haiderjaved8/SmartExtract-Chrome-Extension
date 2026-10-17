@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartExtract - Web Product & Data Scraper</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+
+  <!-- Top App Header -->
+  <header class="app-header">
+    <div class="header-top">
+      <div class="brand">
+        <div class="brand-icon-wrapper">
+          <svg class="brand-icon" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="2" y="2" width="124" height="124" rx="24" fill="#0B132B" stroke="#14B8A6" stroke-width="4"/>
+            <rect x="24" y="32" width="80" height="10" rx="5" fill="#0D9488"/>
+            <rect x="34" y="52" width="60" height="10" rx="5" fill="#14B8A6"/>
+            <polygon points="64,106 44,74 58,74 55,64 82,64 68,78 78,78" fill="#00F2FE"/>
+          </svg>
+        </div>
+        <div>
+          <span class="brand-title">SmartExtract</span>
+          <span class="brand-badge">MV3</span>
+        </div>
+      </div>
+      <div class="header-status" id="tabStatusBadge" title="Current tab status">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="tabHostText">Detecting tab...</span>
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <nav class="nav-tabs">
+      <button class="tab-btn active" data-tab="tab-extract" id="tabBtnExtract">
+        <span>⚡</span> Extract & Preview
+      </button>
+      <button class="tab-btn" data-tab="tab-config" id="tabBtnConfig">
+        <span>⚙️</span> Selectors & Presets
+      </button>
+      <button class="tab-btn" data-tab="tab-help" id="tabBtnHelp">
+        <span>ℹ️</span> Guide & Test
+      </button>
+    </nav>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="app-body">
+
+    <!-- Unsupported / Warning Banner (hidden by default) -->
+    <div class="banner banner-warning" id="unsupportedBanner" style="display: none;">
+      <span class="banner-icon">⚠️</span>
+      <div class="banner-content">
+        <strong id="bannerTitle">Unsupported Page</strong>
+        <p id="bannerDesc">Chrome security blocks extensions on internal browser pages (chrome://, webstore). Please navigate to an online store or use our local sample catalog.</p>
+        <button class="banner-action-btn" id="btnOpenSampleCatalog">Launch Sample Catalog</button>
+      </div>
+    </div>
+
+    <!-- TAB 1: Extract & Preview -->
+    <section class="tab-pane active" id="tab-extract">
+      <!-- Quick Extraction Action Card -->
+      <div class="action-card">
+        <div class="preset-row">
+          <div class="select-wrapper">
+            <select class="custom-select" id="quickPresetSelect" title="Select extraction selector preset">
+              <option value="sample">Preset: Sample Catalog (Default)</option>
+              <option value="generic">Preset: Generic E-Commerce List</option>
+              <option value="single">Preset: Single Product Detail Page</option>
+              <option value="amazon">Preset: Amazon Style</option>
+              <option value="shopify">Preset: Shopify / WooCommerce</option>
+              <option value="custom">Preset: Custom Configured</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="primary-btn" id="btnExtract">
+          <span class="btn-icon">⚡</span>
+          <span id="btnExtractText">Extract from Active Tab</span>
+        </button>
+      </div>
+
+      <!-- Results Header & Counter -->
+      <div class="results-header">
+        <div class="record-badge" id="recordBadge">
+          <span>📦</span> <span id="recordCountText">0 products extracted</span>
+        </div>
+        <div class="search-input-wrapper">
+          <span class="search-icon-placeholder">🔍</span>
+          <input type="text" class="search-input" id="searchFilterInput" placeholder="Filter preview...">
+        </div>
+      </div>
+
+      <!-- Results Table View / Empty State -->
+      <div class="results-box" id="resultsBox">
+        <!-- Empty State Container -->
+        <div class="empty-state" id="emptyState">
+          <svg class="empty-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+          </svg>
+          <div class="empty-title">No Data Extracted Yet</div>
+          <div class="empty-subtitle">Click "Extract from Active Tab" to scrape product titles, prices, and links in real-time.</div>
+          <button class="catalog-link-btn" id="btnEmptySampleLink">Open Sample Catalog for Testing</button>
+        </div>
+
+        <!-- Table View (Hidden when empty) -->
+        <div class="table-scroll" id="tableContainer" style="display: none;">
+          <table class="results-table" id="resultsTable">
+            <thead>
+              <tr>
+                <th class="col-idx">#</th>
+                <th class="col-title">Product Title</th>
+                <th class="col-price">Price</th>
+                <th class="col-url">URL</th>
+                <th class="col-actions"></th>
+              </tr>
+            </thead>
+            <tbody id="resultsTableBody">
+              <!-- Dynamically populated rows -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Export Action Controls -->
+      <div class="export-bar">
+        <div class="export-group">
+          <button class="btn-export" id="btnExportCsv" disabled title="Download safe CSV file">
+            <span>📥</span> Download CSV
+          </button>
+          <button class="secondary-btn" id="btnCopyCsv" disabled title="Copy raw CSV to clipboard">
+            <span>📋</span> Copy CSV
+          </button>
+          <button class="secondary-btn" id="btnCopyJson" disabled title="Copy JSON array">
+            <span>{ }</span> JSON
+          </button>
+        </div>
+        <button class="secondary-btn" id="btnClearData" disabled title="Clear current extracted results">
+          <span>🗑️</span> Clear
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 2: Config & Selectors -->
+    <section class="tab-pane" id="tab-config">
+      <div class="form-section">
+        <div class="section-title">
+          <span>Target CSS Selectors</span>
+          <button class="secondary-btn" id="btnResetSelectors" style="padding: 2px 8px; font-size: 11px;">Reset</button>
+        </div>
+
+        <!-- Extraction Mode Toggle -->
+        <div class="form-group">
+          <label class="form-label" for="extractionMode">
+            Extraction Strategy
+            <span class="label-hint">mode</span>
+          </label>
+          <select class="custom-select" id="extractionMode">
+            <option value="list">Catalog / List Mode (Multiple Products)</option>
+            <option value="single">Single Product Page (Detail View)</option>
+          </select>
+        </div>
+
+        <!-- Item Container Selector -->
+        <div class="form-group" id="containerGroup">
+          <label class="form-label" for="containerSelector">
+            Container / Card Selector
+            <span class="label-hint">e.g. .product-card</span>
+          </label>
+          <input type="text" class="code-input" id="containerSelector" placeholder=".product-card, .s-result-item, article">
+        </div>
+
+        <!-- Title Selector -->
+        <div class="form-group">
+          <label class="form-label" for="titleSelector">
+            Title Selector
+            <span class="label-hint">relative to container</span>
+          </label>
+          <input type="text" class="code-input" id="titleSelector" placeholder=".product-title, h2, .title, [itemprop='name']">
+        </div>
+
+        <!-- Price Selector -->
+        <div class="form-group">
+          <label class="form-label" for="priceSelector">
+            Price Selector
+            <span class="label-hint">relative to container</span>
+          </label>
+          <input type="text" class="code-input" id="priceSelector" placeholder=".product-price, .price, [itemprop='price']">
+        </div>
+
+        <!-- URL Selector -->
+        <div class="form-group">
+          <label class="form-label" for="urlSelector">
+            URL / Link Selector
+            <span class="label-hint">a element inside item</span>
+          </label>
+          <input type="text" class="code-input" id="urlSelector" placeholder=".product-link, a[href*='product'], h2 a, a">
+        </div>
+
+        <!-- Advanced Options -->
+        <div class="toggle-row">
+          <span class="toggle-label">Clean & Normalize Prices (trim text, keep symbol)</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleCleanPrice" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="toggle-row">
+          <span class="toggle-label">Highlight Extracted Items on Tab</span>
+          <label class="switch">
+            <input type="checkbox" id="toggleHighlight" checked>
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="config-actions">
+          <button class="primary-btn" id="btnSavePreset" style="flex: 1;">
+            <span>💾</span> Save Custom Profile
+          </button>
+          <button class="secondary-btn" id="btnTestSelectors" title="Check match count on current page without replacing data">
+            <span>🧪</span> Test Match
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: Guide & Testing -->
+    <section class="tab-pane" id="tab-help">
+      <div class="guide-card">
+        <div class="section-title">Quick Start Guide</div>
+
+        <div class="guide-step">
+          <span class="step-num">1</span>
+          <div class="step-text">
+            <strong>Open any product page or catalog</strong>: Navigate to any e-commerce site or click below to launch the included sample catalog.
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <span class="step-num">2</span>
+          <div class="step-text">
+            <strong>Select or adjust CSS selectors</strong>: Use the default preset for our sample store or configure selectors to match the target site.
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <span class="step-num">3</span>
+          <div class="step-text">
+            <strong>Extract & Review</strong>: Click <strong>Extract from Active Tab</strong>. View title, price, and full resolved URLs instantly.
+          </div>
+        </div>
+
+        <div class="guide-step">
+          <span class="step-num">4</span>
+          <div class="step-text">
+            <strong>Export Secure CSV</strong>: Download the CSV file with automatic formula injection escaping and UTF-8 Excel support.
+          </div>
+        </div>
+
+        <div style="margin-top: 8px;">
+          <button class="primary-btn" id="btnGuideSampleCatalog" style="width: 100%;">
+            <span>🚀</span> Open Local Sample Catalog
+          </button>
+        </div>
+      </div>
+
+      <!-- Safe CSV Details -->
+      <div class="csv-safe-callout">
+        <strong>🛡️ Safe CSV Escaping Active</strong><br>
+        RFC 4180 standard escaping prevents CSV formula injection. Values starting with <code>=</code>, <code>+</code>, <code>-</code>, or <code>@</code> are sanitized to protect Microsoft Excel and Google Sheets from malicious command execution.
+      </div>
+    </section>
+
+  </main>
+
+  <!-- App Footer -->
+  <footer class="app-footer">
+    <div class="security-badge">
+      <span class="security-dot">●</span> 100% Client-Side Privacy
+    </div>
+    <span>SmartExtract v1.0</span>
+  </footer>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">Notification text</div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
