@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aura Tech Store - SmartExtract Test Catalog</title>
+  <style>
+    :root {
+      --bg-base: #0f172a;
+      --bg-surface: #1e293b;
+      --bg-card: #182236;
+      --teal-accent: #00f2fe;
+      --teal-primary: #14b8a6;
+      --text-primary: #f8fafc;
+      --text-muted: #94a3b8;
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-teal: rgba(20, 184, 166, 0.4);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.6;
+      padding-bottom: 60px;
+    }
+
+    /* Helper Testing Floating Bar */
+    .test-toolbar {
+      background: linear-gradient(90deg, #134e4a 0%, #0f172a 100%);
+      border-bottom: 2px solid var(--teal-primary);
+      padding: 12px 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 13px;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+    }
+
+    .toolbar-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 700;
+      color: var(--teal-accent);
+    }
+
+    .selector-badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .selector-tag {
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 12px;
+      border: 1px solid var(--border-teal);
+      color: #5eead4;
+    }
+
+    .toolbar-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-tool {
+      background: rgba(255, 255, 255, 0.1);
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 5px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .btn-tool:hover {
+      background: var(--teal-primary);
+      color: #04101e;
+      border-color: var(--teal-accent);
+    }
+
+    /* Header & Navigation */
+    .store-header {
+      padding: 24px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .store-brand {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .store-brand span {
+      background: linear-gradient(135deg, #00f2fe, #14b8a6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .store-nav {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+    .store-nav a {
+      color: inherit;
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .store-nav a:hover, .store-nav a.active {
+      color: var(--teal-accent);
+    }
+
+    /* Hero */
+    .hero-banner {
+      max-width: 1280px;
+      margin: 24px auto;
+      padding: 40px 32px;
+      background: linear-gradient(135deg, #1e293b 0%, #111d33 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 32px;
+    }
+
+    .hero-content h1 {
+      font-size: 36px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      letter-spacing: -0.5px;
+    }
+
+    .hero-content p {
+      color: var(--text-muted);
+      font-size: 16px;
+      max-width: 580px;
+      margin-bottom: 20px;
+    }
+
+    /* Product Grid */
+    .main-container {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 32px;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 8px;
+    }
+
+    .filter-pill {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 20px;
+      cursor: pointer;
+      font-size: 13px;
+      transition: 0.2s;
+    }
+
+    .filter-pill.active, .filter-pill:hover {
+      background: var(--teal-primary);
+      color: #0b132b;
+      font-weight: 600;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    /* Product Card */
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      transition: all 0.25s ease;
+      position: relative;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-teal);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.4);
+    }
+
+    .card-badge {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(20, 184, 166, 0.2);
+      color: var(--teal-accent);
+      border: 1px solid var(--teal-primary);
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 3px 8px;
+      border-radius: 12px;
+    }
+
+    .product-img-box {
+      height: 160px;
+      background: #0d1527;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .product-img-box svg {
+      width: 80px;
+      height: 80px;
+      color: var(--teal-primary);
+      opacity: 0.9;
+    }
+
+    .product-rating {
+      font-size: 12px;
+      color: #fbbf24;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .rating-count {
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .product-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
+      line-height: 1.35;
+      min-height: 42px;
+    }
+
+    .product-desc {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.4;
+      flex: 1;
+    }
+
+    .card-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .product-price {
+      font-size: 18px;
+      font-weight: 800;
+      color: var(--teal-accent);
+      letter-spacing: -0.3px;
+    }
+
+    .product-link {
+      background: rgba(20, 184, 166, 0.15);
+      color: #2dd4bf;
+      border: 1px solid var(--teal-primary);
+      text-decoration: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+
+    .product-link:hover {
+      background: var(--teal-primary);
+      color: #0b132b;
+    }
+
+    /* Single Product Detail Test Section */
+    .single-product-section {
+      max-width: 1280px;
+      margin: 48px auto 0;
+      padding: 32px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-teal);
+      border-radius: 16px;
+    }
+
+    .detail-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 36px;
+      align-items: center;
+    }
+
+    .detail-img-box {
+      flex: 1;
+      min-width: 280px;
+      height: 240px;
+      background: #09101f;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--border-color);
+    }
+
+    .detail-info {
+      flex: 1.5;
+      min-width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .detail-info h1.product-title {
+      font-size: 28px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .detail-info .product-price {
+      font-size: 26px;
+      color: var(--teal-accent);
+    }
+
+    .buy-btn {
+      background: linear-gradient(135deg, #00f2fe, #14b8a6);
+      color: #070e1e;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      display: inline-block;
+      width: fit-content;
+      text-decoration: none;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hero-banner { flex-direction: column; text-align: center; }
+      .test-toolbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SmartExtract Testing Cheat Sheet Bar -->
+  <aside class="test-toolbar">
+    <div class="toolbar-title">
+      <span>🧪</span> SmartExtract Extension Test Catalog
+    </div>
+    <div class="selector-badges">
+      <span style="color: #94a3b8; font-size: 11px;">MATCHING SELECTORS:</span>
+      <span class="selector-tag">Card: .product-card</span>
+      <span class="selector-tag">Title: .product-title</span>
+      <span class="selector-tag">Price: .product-price</span>
+      <span class="selector-tag">Link: .product-link</span>
+    </div>
+    <div class="toolbar-actions">
+      <button class="btn-tool" id="btnAddFormulaItem" title="Inject item with formula `=CMD|' /C calc'!A0` to test CSV sanitization">
+        + Inject Formula Test Item
+      </button>
+      <button class="btn-tool" id="btnAddProduct">
+        + Add New Product
+      </button>
+    </div>
+  </aside>
+
+  <!-- Store Header -->
+  <header class="store-header">
+    <div class="store-brand">
+      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#00f2fe" stroke-width="2">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      AURA <span>TECH</span>
+    </div>
+    <nav class="store-nav">
+      <a href="#catalog" class="active">Catalog</a>
+      <a href="#single-product">Single Product View</a>
+      <a href="#specs">Extension Specs</a>
+    </nav>
+  </header>
+
+  <!-- Hero Banner -->
+  <section class="hero-banner">
+    <div class="hero-content">
+      <h1>High-Performance Tech & Gadgets</h1>
+      <p>A test environment with rich e-commerce DOM structures designed to validate SmartExtract's CSS selector engine, record counting, and CSV export capabilities.</p>
+    </div>
+  </section>
+
+  <!-- Main Product Catalog -->
+  <main class="main-container" id="catalog">
+    <div class="section-header">
+      <h2 class="section-title">Featured Products Catalog (<span id="catalogCount">8</span> items)</h2>
+      <div class="filter-tabs">
+        <button class="filter-pill active" onclick="filterCategory('all')">All Products</button>
+        <button class="filter-pill" onclick="filterCategory('audio')">Audio</button>
+        <button class="filter-pill" onclick="filterCategory('workstation')">Workstation</button>
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="product-grid" id="productGrid">
+
+      <!-- Product 1 -->
+      <article class="product-card" data-category="audio">
+        <span class="card-badge">Best Seller</span>
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M3 18v-6a9 9 0 0 1 18 0v6"></path>
+            <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"></path>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★★ <span class="rating-count">(420 reviews)</span>
+        </div>
+        <h3 class="product-title">Aura Pulse Wireless Noise-Cancelling Headphones</h3>
+        <p class="product-desc">Spatial audio with ultra-low latency, 40-hour battery life, and active ambient sound pass-through.</p>
+        <div class="card-footer">
+          <div class="product-price">$299.99</div>
+          <a href="product-detail.html?id=101" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 2 -->
+      <article class="product-card" data-category="workstation">
+        <span class="card-badge">Staff Pick</span>
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+            <line x1="8" y1="21" x2="16" y2="21"></line>
+            <line x1="12" y1="17" x2="12" y2="21"></line>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(188 reviews)</span>
+        </div>
+        <h3 class="product-title">Titan Ultra-Wide 34-Inch Curved Monitor (144Hz)</h3>
+        <p class="product-desc">WQHD resolution with HDR600 certification, USB-C 90W power delivery, and quantum dot color gamut.</p>
+        <div class="card-footer">
+          <div class="product-price">$649.00</div>
+          <a href="product-detail.html?id=102" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 3 -->
+      <article class="product-card" data-category="workstation">
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+            <path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M6 16h12"></path>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★★ <span class="rating-count">(312 reviews)</span>
+        </div>
+        <h3 class="product-title">EchoFlow Pro Mechanical Keyboard with Gasket Mount</h3>
+        <p class="product-desc">Hot-swappable tactile switches, CNC aluminum chassis, wireless Bluetooth 5.2, and customizable RGB.</p>
+        <div class="card-footer">
+          <div class="product-price">$139.50</div>
+          <a href="product-detail.html?id=103" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 4 -->
+      <article class="product-card" data-category="workstation">
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="5" y="2" width="14" height="20" rx="7"></rect>
+            <line x1="12" y1="6" x2="12" y2="10"></line>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(95 reviews)</span>
+        </div>
+        <h3 class="product-title">Nova Ergonomic Precision Wireless Mouse (26K DPI)</h3>
+        <p class="product-desc">Ultra-lightweight 58g ergonomic silhouette, optical mechanical switches, and hyper-polling receiver.</p>
+        <div class="card-footer">
+          <div class="product-price">$79.99</div>
+          <a href="product-detail.html?id=104" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 5 -->
+      <article class="product-card" data-category="workstation">
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★★ <span class="rating-count">(215 reviews)</span>
+        </div>
+        <h3 class="product-title">Vortex 3-in-1 Fast Magnetic Wireless Charging Station</h3>
+        <p class="product-desc">Fast 15W Qi2 certified charging for phone, earbuds, and smartwatch simultaneously with cooling fan.</p>
+        <div class="card-footer">
+          <div class="product-price">$49.95</div>
+          <a href="product-detail.html?id=105" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 6 -->
+      <article class="product-card" data-category="workstation">
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
+            <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(84 reviews)</span>
+        </div>
+        <h3 class="product-title">AeroGrip Foldable Aluminum Laptop & Tablet Riser</h3>
+        <p class="product-desc">Precision sandblasted aircraft-grade alloy with silicone grip pads and ventilated airflow design.</p>
+        <div class="card-footer">
+          <div class="product-price">$34.99</div>
+          <a href="product-detail.html?id=106" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 7 -->
+      <article class="product-card" data-category="workstation">
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★★ <span class="rating-count">(160 reviews)</span>
+        </div>
+        <h3 class="product-title">Lumix Studio Streamer Edge-Lit Key Light (CRI 96+)</h3>
+        <p class="product-desc">Ultra-soft diffusion panel, 2500K-9000K bi-color temperature, and seamless Wi-Fi app controls.</p>
+        <div class="card-footer">
+          <div class="product-price">$89.00</div>
+          <a href="product-detail.html?id=107" class="product-link">View Product</a>
+        </div>
+      </article>
+
+      <!-- Product 8 -->
+      <article class="product-card" data-category="audio">
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+          </svg>
+        </div>
+        <div class="product-rating">
+          ★★★★☆ <span class="rating-count">(77 reviews)</span>
+        </div>
+        <h3 class="product-title">SoundWave Rugged Waterproof Bluetooth 5.3 Speaker</h3>
+        <p class="product-desc">IP67 dust and submersible water protection, dual bass radiators, and 24 hours of non-stop playback.</p>
+        <div class="card-footer">
+          <div class="product-price">$119.00</div>
+          <a href="product-detail.html?id=108" class="product-link">View Product</a>
+        </div>
+      </article>
+
+    </div>
+  </main>
+
+  <!-- Single Product Page Simulator Section -->
+  <section class="single-product-section" id="single-product">
+    <div style="margin-bottom: 16px;">
+      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--teal-accent); font-weight: 700;">
+        🎯 Single Product Detail Mode Test
+      </span>
+      <h2 style="font-size: 18px; margin-top: 4px; color: #94a3b8;">
+        Test SmartExtract with "Preset: Single Product Detail Page"
+      </h2>
+    </div>
+
+    <div class="detail-container">
+      <div class="detail-img-box">
+        <svg width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="1.5">
+          <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+        </svg>
+      </div>
+      <div class="detail-info">
+        <span style="color: #5eead4; font-size: 12px; font-weight: 600;">SKU: AUR-FLAGSHIP-99</span>
+        <h1 class="product-title">Aura Apex Studio Wireless Hi-Res DAC Audio Monitor</h1>
+        <p style="color: var(--text-muted); font-size: 14px;">
+          Flagship grade planar magnetic drivers with THX Achromatic Audio Amplifier (AAA) circuitry, balanced 4.4mm Pentaconn output, and lossless LDAC transmission.
+        </p>
+        <div class="product-price">$599.00 USD</div>
+        <div style="display: flex; gap: 12px; margin-top: 8px;">
+          <a href="#buy" class="buy-btn product-link">Purchase Now ($599.00)</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product Detail Mock Destination Page -->
+  <script>
+    let productCounter = 8;
+
+    function filterCategory(cat) {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+      event.target.classList.add('active');
+
+      const cards = document.querySelectorAll('.product-grid .product-card');
+      let visible = 0;
+      cards.forEach(card => {
+        if (cat === 'all' || card.getAttribute('data-category') === cat) {
+          card.style.display = 'flex';
+          visible++;
+        } else {
+          card.style.display = 'none';
+        }
+      });
+      document.getElementById('catalogCount').textContent = visible;
+    }
+
+    // Add formula injection test product
+    document.getElementById('btnAddFormulaItem').addEventListener('click', () => {
+      productCounter++;
+      const grid = document.getElementById('productGrid');
+      const article = document.createElement('article');
+      article.className = 'product-card';
+      article.style.borderColor = '#f59e0b';
+      article.innerHTML = `
+        <span class="card-badge" style="background: rgba(245,158,11,0.2); color: #f59e0b; border-color: #f59e0b;">Formula Test</span>
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5">
+            <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        <h3 class="product-title">=CMD|' /C calc'!A0 - Malicious Formula Test</h3>
+        <p class="product-desc">This product name starts with a formula trigger (=). SmartExtract's safe CSV exporter will prefix it with an apostrophe (') so Excel never executes it!</p>
+        <div class="card-footer">
+          <div class="product-price">+$0.00 (Test)</div>
+          <a href="test-formula-item.html" class="product-link">Test Link</a>
+        </div>
+      `;
+      grid.prepend(article);
+      document.getElementById('catalogCount').textContent = ++productCounter;
+      alert('Injected Formula Injection test item into the catalog! Now run SmartExtract and export CSV to see the safe escaping.');
+    });
+
+    // Add regular product
+    document.getElementById('btnAddProduct').addEventListener('click', () => {
+      productCounter++;
+      const grid = document.getElementById('productGrid');
+      const article = document.createElement('article');
+      article.className = 'product-card';
+      article.innerHTML = `
+        <span class="card-badge">New Arrival</span>
+        <div class="product-img-box">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#00f2fe" stroke-width="1.5">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 14 14"></polyline>
+          </svg>
+        </div>
+        <h3 class="product-title">Aura Smart Sensor Hub Gen ${productCounter}</h3>
+        <p class="product-desc">Seamless IoT matter integration with environmental telemetry and real-time dashboarding.</p>
+        <div class="card-footer">
+          <div class="product-price">$${(Math.random() * 100 + 49).toFixed(2)}</div>
+          <a href="product-detail.html?id=${productCounter}" class="product-link">View Product</a>
+        </div>
+      `;
+      grid.appendChild(article);
+      document.getElementById('catalogCount').textContent = productCounter;
+    });
+  </script>
+</body>
+</html>
